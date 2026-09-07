@@ -12,7 +12,7 @@ resource "aws_ecs_task_definition" "fastapi_task" {
   container_definitions = jsonencode([
     {
       name  = "fastapi-container"
-      image = "crccheck/hello-world:latest"
+      image = "${aws_ecr_repository.fastapi-docker-repo.repository_url}:latest"
       portMappings = [
         {
           containerPort = 8000
