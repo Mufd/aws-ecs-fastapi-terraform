@@ -1,9 +1,12 @@
+data "tls_certificate" "github" {
+  url = "https://token.actions.githubusercontent.com"
+}
+
 resource "aws_iam_openid_connect_provider" "github_actions" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["1c58a3a8518e8759bf075b76b750d4f2df264fcd", "6938fd4d98bab03faadb97b34396831e3780aea1"] # Официальные отпечатки GitHub
+  thumbprint_list = [data.tls_certificate.github.certificates[0].sha1_fingerprint]
 }
-
 resource "aws_iam_role" "github_actions_role" {
   name = "github-actions-deploy-role"
 
@@ -18,7 +21,10 @@ resource "aws_iam_role" "github_actions_role" {
         }
         Condition = {
           StringLike = {
-            "token.actions.githubusercontent.com:sub" : "repo:mufd/aws-ecs-fastapi-terraform:*"
+            "token.actions.githubusercontent.com:sub" : "repo:Mufd/aws-ecs-fastapi-terraform:*"
+          }
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
           }
         }
       }
